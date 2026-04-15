@@ -1,43 +1,39 @@
-import pygame 
-import datetime 
+import pygame
+import datetime
 
-pygame.init()
+class MickeyClock:
+    def __init__(self):
+       
+        self.bg = pygame.image.load('images/mainclock.png')
+        self.bg = pygame.transform.scale(self.bg, (600, 600))
 
-screen = pygame.display.set_mode((800, 800))
-pygame.display.set_caption("mickey clock")
-clock = pygame.time.Clock()
-done = True 
+        self.min_arm = pygame.image.load('images/rightarm.png')
+        self.min_arm = pygame.transform.scale(self.min_arm, (800, 700))
 
-myClock = pygame.image.load('images/mainclock.png')
-myClock = pygame.transform.scale(myClock, (600, 600))
+        self.sec_arm = pygame.image.load('images/leftarm.png')
+        self.sec_arm = pygame.transform.scale(self.sec_arm, (40, 500))
 
-minute_arrow = pygame.image.load('images/rightarm.png')
-minute_arrow = pygame.transform.scale(minute_arrow, (800, 700))
-second_arrow = pygame.image.load('images/leftarm.png')
-second_arrow = pygame.transform.scale(second_arrow, (40, 500))
+    def get_angles(self):
+        
+        now = datetime.datetime.now()
+        angle_min = now.minute * -6 - 25
+        angle_sec = now.second * -6
+        return angle_min, angle_sec
 
+    def draw(self, screen):
+        
+        angle_min, angle_sec = self.get_angles()
+        center = (screen.get_width() // 2, screen.get_height() // 2)
 
-while done:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            done = False
+        
+        rotated_min = pygame.transform.rotate(self.min_arm, angle_min)
+        rotated_sec = pygame.transform.rotate(self.sec_arm, angle_sec)
 
-    my_time = datetime.datetime.now()
-    hourINT = int(my_time.strftime("%I"))
-    minuteINT = int(my_time.strftime("%M"))
-    secondINT = int(my_time.strftime("%S"))
+       
+        screen.blit(self.bg, (100, 100))
 
-    angleMINUTE = minuteINT * -6 - 25 
-    angleSECOND = secondINT * -6 
-
-    minute = pygame.transform.rotate(minute_arrow, angleMINUTE)
-    second = pygame.transform.rotate(second_arrow, angleSECOND)
-
-    screen.fill((255, 255, 255))
-    screen.blit(myClock, (100, 100))
-    screen.blit(second, (400 - int(second.get_width() / 2), 400 - int(second.get_height() / 2)))
-    screen.blit(minute, (400 - int(minute.get_width() / 2), 400 - int(minute.get_height() / 2)))
-    pygame.display.flip()
-    clock.tick(60)
-
-pygame.quit()
+       
+        screen.blit(rotated_sec, (center[0] - rotated_sec.get_width() // 2, 
+                                  center[1] - rotated_sec.get_height() // 2))
+        screen.blit(rotated_min, (center[0] - rotated_min.get_width() // 2, 
+                                  center[1] - rotated_min.get_height() // 2))
